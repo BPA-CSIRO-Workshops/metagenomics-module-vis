@@ -7,11 +7,10 @@
 %    within the \setModuleAuthors{} and \setModuleContributions{} environments
 \setModuleTitle{Visualisation}
 \setModuleAuthors{%
-  Jane Bloggs \mailto{jane.bloggs@example.com} \\
-  Joe Bloggs \mailto(joe.bloggs@example.com)
+  Paula Moolhuijzen \mailto{paula.moolhuijzen@curtin.edu.au} \\
 }
 \setModuleContributions{%
-  John Doe \mailto{john.dow@example.com}%
+  Peter Sterk \mailto{psterki@ebi.org.uk}%
 }
 
 % BEGIN: Module Title Page
@@ -37,10 +36,8 @@
 
 After completing this module the trainee should be able to:
 \begin{itemize}
-  \item Assess the overall quality of NGS sequence reads
-  \item Visualise the quality, and other associated matrices, of reads to decide
-        on filters and cutoffs for cleaning up data ready for downstream analysis
-  \item Clean up and pre-process the sequences data for further analysis
+  \item Visualise between sample comparisons, using Emperor PCA
+  \item Understand the difference between weighted and unweighted analysis
 \end{itemize}
 % END KLOs
 
@@ -51,19 +48,17 @@ After completing this module the trainee should be able to:
  
 \subsection{Tools Used}
 \begin{description}[style=multiline,labelindent=0cm,align=left,leftmargin=0.5cm]
-  \item[FastQC]\hfill\\
-  	\url{http://www.bioinformatics.babraham.ac.uk/projects/fastqc/}
-  \item[FASTX-Toolkit]\hfill\\
-  	\url{http://hannonlab.cshl.edu/fastx_toolkit/}
-  \item[Picard]\hfill\\
-  	\url{http://picard.sourceforge.net/}
+  \item[Emperor ]\hfill\\
+  	\url{http://qiime.org/emperor/tutorial_index.html}
 \end{description}
 
-\section{Useful Links}
+\section{Data sets}
  
 \begin{description}[style=multiline,labelindent=0cm,align=left,leftmargin=0.5cm]
-  \item[FASTQ Encoding]\hfill\\
-    \url{http://en.wikipedia.org/wiki/FASTQ_format#Encoding}
+  \item[Sutton et al. (2013). Impact of Long-Term Diesel Contamination on Soil Microbial Community Structure ]\hfill\\
+    \url{http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3553749/pdf/zam619.pdf}
+  \item[Fierer et al. (2010). Forensic identification using skin bacterial communities]\hfill\\
+    \url{http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2852011/}
 \end{description}
 
 \newpage
@@ -75,119 +70,199 @@ After completing this module the trainee should be able to:
 % To make a paragraph appear as a "note" to the reader, simply wrap it in a "note" environment like
 % this:
 \begin{note}
-This is an important note to the reader. The paragraph get's it own margin icon and formatting to
-ensure it stands out.
+Good data quality and sample metadata is important for visualising metagenomics analysis.
 \end{note}
 
-There are 10 characters which have special meaning in \LaTeX and to have them displayed as literal
-characters we need to do something special. The first seven can simply be prepended by a backslash;
-for the other three, we must use the macros \verb+\textasciitilde+, \verb+\textasciicircum+,
-\verb+\textbackslash+.
+For this tutorial we are using Emperor a browser enabled scatter plot visualisation tool. We will be using the Sutton and Fierer data sets for viewing the principal components analysis (PCoA) from the QIIME Beta diversity analysis (16S). 
+% END: Introduction
 
+% BEGIN: Beta Diversity computation and plots
+\section{Beta Diversity computation and plots}
 
-\& \% \$ \# \_ \{ \}
+Beta diversity represents between sample comparisons based on their composition. The output of these comparisons is a square matrix where a “distance” or dissimilarity is calculated between every pair of community samples, reflecting the dissimilarity between those samples. The data distance matrix can be then visualized with analyses such as PCoA and hierarchical clustering. PCoA is a technique that maps the samples in the distance matrix to a set of axes that show the maximum amount of variation explained. The principal coordinates can be plotted in two or three dimensions to provide an intuitive visualization of the data structure to look at differences between the samples, and look for similarities by sample conditions. 
 
-\textasciitilde
+The Beta diversity workflow you ran earlier contained a number of steps: 
+\begin{itemize}
+  \item Rarifying the OTU table to remove sample heterogeneity. A rarified OTU table should be used so that artificial diversity induced due to different sampling effort is removed. 
+  \item Calculating the Beta diversity, the unifrac weighted and unweighted generated principal coorodinates are created here by default.
+\end{itemize}
 
-\textasciicircum
+The following are the required options and inputs for Beta diversity analysis:
 
-\textbackslash
+\begin{lstlisting}
+1.	Option -i, OTU table (*.biom)
+2.	Option –t, phylogeny tree (*.tre) from pick_de_novo_otus.py
+3.	Option –m, the user-defined mapping file 
+4.	Option –o, the output directory
+5.	Option –e, the number of sequences per sample (sequencing depth) 
+\end{lstlisting}
 
-Highly redundant coverage ($>$15X) of the genome can be used to correct sequencing
-errors in the reads before assembly and errors. Various k-mer based error
-correction methods exist but are beyond the scope of this tutorial.
+You do not need to run the following command, it may overwrite the pre-computed analysis. This is the command you ran on the Sutton sub dataset.
 
-In order to use a single character to encode Phred qualities, ASCII characters
-are used (\url{http://shop.alterlinks.com/ascii-table/ascii-table-us.php}). All ASCII characters have a decimal
-number associated with them but the first 32 characters are non-printable (e.g.
+\begin{lstlisting}
+beta_diversity_through_plots.py -i otus/otu_table.biom -m mapping.txt -o wf_bdiv_even122/ -t otus/rep_set.tre -e 122
+\end{lstlisting}
 
-Because ASCII characters $<$ 33 are non-printable, using the Phred+33 encoding was
-not possible. Therefore, they simply moved the offset from 33 to 64 thus
-
-schema it is not always possible to identify what encoding is in use. For
-example, if the only characters seen in the quality string are (\texttt{@ABCDEFGHI}),
-then it is impossible to know if you have really good Phred+33 encoded qualities
-or really bad Phred+64 encoded qualities.
-
-\subsection{Tables}
-
-Writing tables in \LaTeX is HARD! Rather than write them from scratch, I'd head over to
-\url{http://www.tablesgenerator.com/latex_tables}, generate the table you want using the interactive
-page and copy the resulting \LaTeX into your source file.
-
-\begin{tabular}{llr}
-\hline
-\multicolumn{2}{c}{Item} \\
-\cline{1-2}
-Animal    & Description & Price (\$) \\
-\hline
-Gnat      & per gram    & 13.65      \\
-          & each        & 0.01       \\
-Gnu       & stuffed     & 92.50      \\
-Emu       & stuffed     & 33.33      \\
-Armadillo & frozen      & 8.99       \\
-\hline
-\end{tabular}
-
-\subsection{Figures}
-
-No handout is complete without figures, screenshots or similar.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth]{handout/bad_example.png}
-\caption{Per base sequence quality plot for \texttt{bad\_example.fastq}.}
-\label{fig:bad_example_untrimmed_plot}
-\end{figure}
-
-\subsection{Maths Environment}
-
-I won't pretend to be an expert in \LaTeX but I do know that one of the strengths of \LaTeX is it's
-ability to allow mathematical formulas to be constructed and typeset very easily. Firstly, you have
-to tell \LaTeX what text is going to contain mathematical symbols.
-
-For inline display, simply surround the relevant text by dollar signs: \verb+$Q(A) =-10 log10(P(\sim A))$+
-
-For more complex mathematical formulas which need to be displayed separately, use the
-\verb+\begin{displaymath} ... \end{displaymath}+ environment to wrap around your formulas.
-
-\begin{displaymath}
-Q(A) =-10 log10(P(\sim A))
-\end{displaymath} 
-
-
-\subsection{Questions and Answers}
-
-It is useful to maintain the answers to questions together in the same \LaTeX source. By using the
-\verb+\begin{answer} ... \end{answer}+ environment we can have the enclosed answers excluded from
-the trainee's version of the handout while including it in the trainer's version of the handout.
-
-\begin{questions}
-We can ask a simply question to test if the trainee is understanding what they are doing. 
-\begin{answer}
-We can maintain the answer along side the questions.
-\end{answer}
-
-\end{questions}
-
-\subsection{Code For Trainees to Copy/Type}
-
-Different people have different opinions on whether it is a good idea to provide the commands for
-trainees to copy-and-paste. In our experience, there is a huge amount of time wasted by novices
-typing commands incorrectly or changing filenames which affects commands you might run later on. We
-also think that it's a good idea to pose regular questions or ask the trainees to modify a previous
-command. This way you can catch out those whoe are just trying to get ahead by blindly
-copying-and-pasting.
-
-To provide a nicely formatted, copy-and-pastable command, simply wrap it in the
-\verb+\begin{lstlisting} ... \end{lstlisting}+ environment. Long commands will be wrapped
-automatically and bash line continuation characters (\textbackslash) inserted where required.
+% BEGIN: Prepare the environment
+\subsection{Prepare the environment}
+The data for this practical can be found in the Taxonomy directory on your desktop. Go to the pre-computed Beta diversity analysis in the Taxonomy directory. 
 
 \begin{steps}
+
+Open the Terminal and go to where the data is stored. Investigate the directories available.
+
 \begin{lstlisting}
-cd ~/QC
-fastx_clipper -h
-fastx_clipper -v -Q 33 -l 20 -M 15 -a GATCGGAAGAGCGGTTCAGCAGGAATGCCGAG -i bad_example.fastq -o bad_example_clipped.fastq
+cd ~/Desktop/Taxonomy/sutton_full_denoised/
+ls –lhtr
 \end{lstlisting}
 \end{steps}
 
+\begin{steps}
+Open the following files:
+wf_bdiv_even394/unweighted_unifrac_pc.txt and wf_bdiv_even394/weighted_unifrac_pc.txt 
+using the ‘less’ command. The option –S with ‘less’ allows you to view files with unwrapped lines, to escape type q (for quit). To scroll left and right, use the arrow keys.
+\begin{lstlisting}
+less –S wf_bdiv_even394/unweighted_unifrac_pc.txt
+less –S wf_bdiv_even394/weighted_unifrac_pc.txt
+\end{lstlisting}
+\end{steps}
+
+In each file every sample is listed in the first column, and the subsequent columns contain the value for the sample against the noted principal coordinate. At the bottom of each Principal Coordinate column, you will find the eigen value and percent of variation explained by the coordinate. 
+Note the major difference between weighted and unweighted analysis is the inclusion of OTU abundance when calculating distances between communities. You should use weighted if the biological question you are trying to ask takes OTU abundance of your groups into consideration. If some samples are forming groups with weighted, then likely the larger or smaller abundances of several OTUs are the primary driving force in PCoA space, but when all OTUs are considered at equal abundance, these differences are lost (unweighted).
+
+Note discrete vs. continuous only has to do with coloring of the points, and not the calculation of UniFrac distances.
+% END: Prepare the environment
+
+
+\subsection{Emperor}
+\begin{steps}
+We can now run Emperor to prepare the PCoA plots for visualisation.
+
+\begin{lstlisting}
+make_emperor.py -i wf_bdiv_even394/unweighted_unifrac_pc.txt -m sutton_mapping_file.txt –b "Source,Condition,Source&&Condition" –o emporer_output_unweighted
+ 
+ls –l emporer_output_unweighted
+\end{lstlisting}
+\end{steps}
+
+\begin{steps}
+Run the last make_emporer.py command with the weighted_unifrac, using the same command. Make sure you rename the output directory to “emporer_output_weighted“. Look in the Emporer output directories and note the index.html file outputs.
+\end{steps}
+
+To view the index.html files created from the ‘make_emperor.py’ steps above a browser like Firefox or Chrome can be used. 
+
+\begin{steps}
+Important - To view the Emporer plots we need to switch from the VM to your local machine.
+Open the Firefox browser and view the pre-computed Emporer directories available at the following URL. \url{http://www.ebi.ac.uk/~sterk/emperor/}
+\end{steps}
+
+View the unweighted analysis on the Sutton sub data set:
+\begin{steps}
+\url{http://www.ebi.ac.uk/~sterk/emperor/sutton_subset_emporer_output_unweighted/}
+\end{steps}
+
+
+\begin{questions}
+Check the ‘Colors’ options to view your samples. 
+What can you determine from the PCoA plot?
+\begin{answer}
+
+\end{answer}
+\end{questions}
+
+\begin{information}
+To change the colouring scheme click the ‘Colors’ tab. The available metadata categories are sorted in alphabetical order. Extra information on the features can be found at \url{http://qiime.org/emperor/description_index.html}
+Try changing the scaling, visibility, label etc. to improve the display.
+Note that Emperor generates publication quality figures in scalable vector graphics (SVG) format.
+\end{information}
+
+\begin{steps}
+Now look at the weighted unifrac analysis, \url{http://www.ebi.ac.uk/~sterk/emperor/sutton_subset_emporer_output_weighted/}
+
+You can compare the sub data analysis against the full-denoised dataset.
+\url{ttp://www.ebi.ac.uk/~sterk/emperor/sutton_full_denoised/}
+\end{steps}
+
+\begin{questions}
+What are the main differences between the weighted and unweighted plots?
+\begin{answer}
+
+\end{answer}
+\end{questions}
+
+\begin{questions}
+Did you notice any differences between the analysis on the sub data set and the full denoised?
+\begin{answer}
+
+\end{answer}
+\end{questions}
+
+\begin{questions}
+What are your final conclusions on the Sutton dataset? 
+\begin{answer}
+
+\end{answer}
+\end{questions}
+
+\begin{questions}
+What did each of the visualisation methods describe?
+\begin{answer}
+Taxonomy summary plots: 
+
+Alpha diversity plots:
+
+Beta diversity PCoA plots:
+
+\end{answer}
+\end{questions}
+	
+Now that you are familiar with Emperor we will next view the forensic analysis of the Fierer et. al. data. This experiment matches the bacteria on surfaces to the skin-associated bacteria of the individual who touched the surface. 
+This study shows that skin-associated bacteria can be readily recovered from surfaces (including single computer keys and computer mice) and that the structure of these communities can be used to differentiate objects handled by different individuals, even if those objects have been left untouched for up to 2 weeks at room temperature.
+
+Please look the information contained in the mapping file and identify those fields that can be plotted. 
+
+\begin{steps}
+\begin{lstlisting}
+cd ~/Desktop/Taxonomy/fierer/
+less –S fierer_mapping_file.txt
+\end{lstlisting}
+\end{steps}
+
+\begin{questions}
+List any fields that can be plotted for this study. What is the remainder of the information for?
+\begin{answer}
+
+
+\end{answer}
+\end{questions}
+
+Run Emperor to prepare the PCoA plots for visualisation
+\begin{steps}
+\begin{lstlisting}
+make_emperor.py -i fierer_unweighted_unifrac_pc.txt -m fierer_mapping_file.txt -b \ "HOST_SUBJECT_ID,ENV_FEATURE,HOST_SUBJECT_ID&&ENV_FEATURE” -o emporer_output_unweighted
+\end{lstlisting}
+\end{steps}
+
+\begin{steps}
+Go to \url{http://www.ebi.ac.uk/~sterk/emperor/fierer_emporer_output_unweighted/}
+\end{steps}
+
+\begin{questions}
+What did you observe about the clustering?
+\begin{answer}
+
+\end{answer}
+\end{questions}
+
+\begin{questions}
+What fields have been selected?
+\begin{answer}
+
+\end{answer}
+\end{questions}
+
+\begin{note}
+The on-line Qiime tutorials are very good and growing in numbers. It is highly recommended checking out in future the many analysis options.
+\end{note}
+
+% END: Beta Diversity computation and plots
